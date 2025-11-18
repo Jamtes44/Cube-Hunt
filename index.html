@@ -3,30 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cube Hunt - VR</title>
+    <title>Basic Three.js Project</title>
     <style>
-        body { 
-            margin: 0; 
-            cursor: crosshair; 
-            overflow: hidden;
-            background: #000;
-        }
-        canvas { 
-            display: block; 
-            width: 100%;
-            height: 100%;
-        }
+        body { margin: 0; cursor: crosshair; }
+        canvas { display: block; }
         #ui {
             position: absolute;
             top: 10px;
             left: 10px;
             color: white;
             font-family: Arial, sans-serif;
-            font-size: 16px;
-            background: rgba(0, 0, 0, 0.7);
+            font-size: 18px;
+            background: rgba(0, 0, 0, 0.5);
             padding: 10px;
             border-radius: 5px;
-            z-index: 100;
         }
         #menu {
             position: absolute;
@@ -36,70 +26,42 @@
             text-align: center;
             color: white;
             font-family: Arial, sans-serif;
-            background: rgba(0, 0, 0, 0.9);
-            padding: 30px;
-            border-radius: 15px;
-            z-index: 100;
-            width: 80%;
-            max-width: 400px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border-radius: 10px;
         }
         #menu h1 {
-            font-size: 36px;
+            font-size: 48px;
             margin-bottom: 20px;
-            color: #4CAF50;
         }
         #menu button {
-            font-size: 20px;
-            padding: 12px 24px;
+            font-size: 24px;
+            padding: 10px 20px;
             background: #4CAF50;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 5px;
             cursor: pointer;
-            margin: 5px;
-            width: 100%;
         }
         #menu button:hover {
             background: #45a049;
-        }
-        #vr-info {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            color: yellow;
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-            background: rgba(0,0,0,0.7);
-            padding: 8px;
-            border-radius: 5px;
-            z-index: 100;
         }
     </style>
 </head>
 <body>
     <div id="menu" style="display: block;">
-        <h1>🎯 Cube Hunt</h1>
-        <button id="startButton">▶ Jugar</button>
-        <button id="vrButtonMobile">🎮 Modo VR</button>
-        <div style="margin-top: 15px; font-size: 14px; color: #ccc;">
-            Usa el modo VR en dispositivos compatibles
-        </div>
+        <h1>Cube Hunt</h1>
+        <button id="startButton">Jugar</button>
     </div>
-    
     <div id="ui" style="display: none;">
         <div>Ronda: <span id="round">1</span></div>
         <div>Puntuación: <span id="score">0</span></div>
         <div>Vidas: <span id="lives">3</span></div>
-        <div>Mejor: <span id="highScore">0</span></div>
+        <div>Mejor Puntuación: <span id="highScore">0</span></div>
     </div>
-
-    <div id="vr-info"></div>
-
-    <!-- Three.js desde CDN oficial -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/webxr/VRButton.js"></script>
-    
-    <script src="main.js"></script>
+    <script type="module" src="main.js"></script>
 </body>
 </html>
