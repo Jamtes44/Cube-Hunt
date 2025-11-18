@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Three.js Project</title>
+    <style>
+        body { margin: 0; cursor: crosshair; }
+        canvas { display: block; }
+        #ui {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        #menu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            font-family: Arial, sans-serif;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border-radius: 10px;
+        }
+        #menu h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        #menu button {
+            font-size: 24px;
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #menu button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div id="menu" style="display: block;">
+        <h1>Cube Hunt</h1>
+        <button id="startButton">Jugar</button>
+    </div>
+    <div id="ui" style="display: none;">
+        <div>Ronda: <span id="round">1</span></div>
+        <div>Puntuación: <span id="score">0</span></div>
+        <div>Vidas: <span id="lives">3</span></div>
+        <div>Mejor Puntuación: <span id="highScore">0</span></div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>

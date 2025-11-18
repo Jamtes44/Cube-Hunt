@@ -1,0 +1,26 @@
+# TODO: Modify Basic Three.js Project
+
+- [x] Remove cube animation from main.js
+- [x] Add OrbitControls to index.html and main.js
+- [x] Test the project by opening index.html in a web browser
+- [x] Add ambient light to main.js
+- [x] Change cube material to Phong in main.js
+- [x] Test the updated project
+- [x] Replace cube with OBJ model from modelos/bosque.obj
+- [x] Test the project with OBJ model
+- [x] Load UV map as skybox in main.js
+- [x] Add two cubes (red and green) above the 3D model
+- [x] Create 'volar' function for green cube bird-like movement
+- [x] Create 'disparo' function for green cube click to change to red, stop, and fade out
+- [x] Remove OrbitControls to avoid interference with click detection
+- [x] Implement game rounds: 5 cubes per round, track round number, log to console
+- [x] Add scoring system: base 100 points per cube, adjust for speed, deduct for misses
+- [x] Add lives system: 3 shots, decrease on each click, recover on hit, game over when 0
+- [x] Display game info (round, score, lives) on screen instead of console
+- [x] Adjust cube speed: slower in lower rounds, faster in higher rounds
+- [x] Display round increase message
+- [x] Implement high score storage and display
+- [x] Add start menu with title "Cube Hunt" and "Jugar" button
+- [x] Reset game and show menu on game over
+- [x] Change mouse cursor to crosshair
+- [ ] Add VR button support
