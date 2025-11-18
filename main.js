@@ -33,33 +33,42 @@ let gameStarted = false;
 function initVR() {
     if ('xr' in navigator) {
         navigator.xr.isSessionSupported('immersive-vr')
-            .then((supported) => {
-                if (supported) {
+            .then((vrSupported) => {
+                if (vrSupported) {
                     // Crear botón VR oficial
                     const vrButton = VRButton.createButton(renderer);
                     document.body.appendChild(vrButton);
-                    
+
                     // Inicializar controladores VR
                     initVRControllers();
-                    console.log('VR está disponible');
+                    console.log('VR inmersivo disponible');
                 } else {
-                    console.log('VR no está disponible en este dispositivo');
-                    createVRWarning();
+                    // Verificar si AR está disponible (para móviles)
+                    navigator.xr.isSessionSupported('immersive-ar')
+                        .then((arSupported) => {
+                            if (arSupported) {
+                                console.log('AR disponible, pero VR no. Considera usar AR.');
+                                createVRWarning('AR disponible, VR no soportado en este dispositivo.');
+                            } else {
+                                createVRWarning('VR/AR no disponible en este dispositivo.');
+                            }
+                        })
+                        .catch(() => createVRWarning('Error verificando AR.'));
                 }
             })
             .catch((error) => {
-                console.error('Error verificando soporte VR:', error);
-                createVRWarning();
+                console.error('Error verificando VR:', error);
+                createVRWarning('Error al verificar soporte VR.');
             });
     } else {
-        console.log('WebXR no está soportado en este navegador');
-        createVRWarning();
+        console.log('WebXR no soportado en este navegador');
+        createVRWarning('WebXR no soportado. Actualiza tu navegador.');
     }
 }
 
-function createVRWarning() {
+function createVRWarning(message = 'VR no disponible') {
     const warning = document.createElement('div');
-    warning.textContent = 'VR no disponible';
+    warning.textContent = message;
     warning.style.position = 'absolute';
     warning.style.bottom = '10px';
     warning.style.right = '10px';
