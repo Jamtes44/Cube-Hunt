@@ -1,10 +1,10 @@
-import { VRButton } from 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/webxr/VRButton.js';
+// main.js - VERSIÓN CORREGIDA PARA VR
 
 const scene = new THREE.Scene();
 
+// Cámara principal
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(-0.030334074747951856, 2, 5);
-camera.rotation.set(-0.1407195740688759, 0.06389826150723957, 0.0090451565050258);
+camera.position.set(0, 1.6, 5); // Posición más estándar para VR
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -28,6 +28,7 @@ let roundStartTime = 0;
 let lives = 3;
 let highScore = localStorage.getItem('highScore') || 0;
 let gameStarted = false;
+let inVRMode = false;
 
 // Función para inicializar VR
 function initVR() {
@@ -37,11 +38,28 @@ function initVR() {
                 if (supported) {
                     // Crear botón VR oficial
                     const vrButton = VRButton.createButton(renderer);
+                    vrButton.style.position = 'absolute';
+                    vrButton.style.bottom = '20px';
+                    vrButton.style.left = '20px';
                     document.body.appendChild(vrButton);
                     
                     // Inicializar controladores VR
                     initVRControllers();
                     console.log('VR está disponible');
+                    
+                    // Configurar eventos de sesión VR
+                    renderer.xr.addEventListener('sessionstart', () => {
+                        console.log('Sesión VR iniciada');
+                        inVRMode = true;
+                        repositionForVR();
+                    });
+                    
+                    renderer.xr.addEventListener('sessionend', () => {
+                        console.log('Sesión VR terminada');
+                        inVRMode = false;
+                        repositionForDesktop();
+                    });
+                    
                 } else {
                     console.log('VR no está disponible en este dispositivo');
                     createVRWarning();
@@ -54,6 +72,50 @@ function initVR() {
     } else {
         console.log('WebXR no está soportado en este navegador');
         createVRWarning();
+    }
+}
+
+// Reposicionar elementos para VR
+function repositionForVR() {
+    console.log('Reposicionando para VR...');
+    
+    // Reposicionar cubos verdes alrededor del jugador
+    greenCubes.forEach((cube, index) => {
+        if (cube && !cube.isShot) {
+            const angle = (index / greenCubes.length) * Math.PI * 2;
+            const radius = 3 + Math.random() * 2;
+            cube.position.set(
+                Math.cos(angle) * radius,
+                1.5 + Math.random() * 2,
+                Math.sin(angle) * radius
+            );
+        }
+    });
+    
+    // Reposicionar cubo rojo de referencia
+    const redCube = scene.getObjectByName('referenceCube');
+    if (redCube) {
+        redCube.position.set(-2, 1, -2);
+    }
+}
+
+// Volver a posición desktop
+function repositionForDesktop() {
+    console.log('Volviendo a modo escritorio...');
+    
+    greenCubes.forEach((cube, index) => {
+        if (cube && !cube.isShot) {
+            cube.position.set(
+                Math.random() * 12 - 6,
+                Math.random() * 6 + 1,
+                0
+            );
+        }
+    });
+    
+    const redCube = scene.getObjectByName('referenceCube');
+    if (redCube) {
+        redCube.position.set(-6, -2, 0);
     }
 }
 
@@ -83,12 +145,16 @@ function initVRControllers() {
     controller2.addEventListener('selectend', onSelectEnd);
     scene.add(controller2);
 
+    // Geometrías para los controladores
+    const controllerGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.1, 8);
+    const controllerMaterial = new THREE.MeshBasicMaterial({ color: 0x4444ff });
+    
     controllerGrip1 = renderer.xr.getControllerGrip(0);
-    controllerGrip1.add(new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.1), new THREE.MeshBasicMaterial({ color: 0x000000 })));
+    controllerGrip1.add(new THREE.Mesh(controllerGeometry, controllerMaterial));
     scene.add(controllerGrip1);
 
     controllerGrip2 = renderer.xr.getControllerGrip(1);
-    controllerGrip2.add(new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.1), new THREE.MeshBasicMaterial({ color: 0x000000 })));
+    controllerGrip2.add(new THREE.Mesh(controllerGeometry, controllerMaterial));
     scene.add(controllerGrip2);
 
     // Líneas de rayo para feedback visual
@@ -147,21 +213,29 @@ window.addEventListener('click', (event) => {
         }
     }
     if (!hit) {
-        lives--;
-        score -= 20;
-        if (score < 0) score = 0;
-        document.getElementById('score').textContent = score;
-        document.getElementById('lives').textContent = lives;
-        console.log(`Fallo! Puntuación: ${score}, Vidas restantes: ${lives}`);
-        if (lives <= 0) {
-            gameOver();
-        }
+        handleMiss();
     }
 });
 
+function handleMiss() {
+    lives--;
+    score -= 20;
+    if (score < 0) score = 0;
+    document.getElementById('score').textContent = score;
+    document.getElementById('lives').textContent = lives;
+    console.log(`Fallo! Puntuación: ${score}, Vidas restantes: ${lives}`);
+    if (lives <= 0) {
+        gameOver();
+    }
+}
+
 // Iluminación
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
 scene.add(ambientLight);
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+directionalLight.position.set(5, 10, 5);
+scene.add(directionalLight);
 
 // Skybox
 const cubeTextureLoader = new THREE.CubeTextureLoader();
@@ -184,10 +258,12 @@ objLoader.load('modelos/bosque.obj', (object) => {
     object.scale.set(1, 1, 1);
     scene.add(object);
 
+    // Cubo rojo de referencia
     const redCubeGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
     const redCubeMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 });
     const redCube = new THREE.Mesh(redCubeGeometry, redCubeMaterial);
     redCube.position.set(-6, -2, 0);
+    redCube.name = 'referenceCube'; // Nombre para identificarlo después
     scene.add(redCube);
 
     document.getElementById('highScore').textContent = highScore;
@@ -196,6 +272,9 @@ objLoader.load('modelos/bosque.obj', (object) => {
     initVR();
 }, undefined, (error) => {
     console.error('Error cargando el modelo OBJ:', error);
+    // Continuar incluso si el modelo falla
+    document.getElementById('highScore').textContent = highScore;
+    initVR();
 });
 
 // Evento del botón de inicio
@@ -229,7 +308,24 @@ function startRound() {
         const greenCubeGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
         const greenCubeMaterial = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
         const greenCube = new THREE.Mesh(greenCubeGeometry, greenCubeMaterial);
-        greenCube.position.set(Math.random() * 12 - 6, Math.random() * 6 + 1, 0);
+        
+        // Posición diferente según el modo
+        if (inVRMode) {
+            const angle = (i / cubesPerRound) * Math.PI * 2;
+            const radius = 3 + Math.random() * 2;
+            greenCube.position.set(
+                Math.cos(angle) * radius,
+                1.5 + Math.random() * 2,
+                Math.sin(angle) * radius
+            );
+        } else {
+            greenCube.position.set(
+                Math.random() * 12 - 6,
+                Math.random() * 6 + 1,
+                0
+            );
+        }
+        
         greenCube.spawnTime = Date.now();
         scene.add(greenCube);
         greenCubes.push(greenCube);
@@ -242,8 +338,17 @@ function volar() {
     greenCubes.forEach(cube => {
         if (cube && !cube.isShot) {
             const time = Date.now() * 0.001 + cube.position.x * 0.1;
-            cube.position.x += Math.sin(time) * 0.01 * speedMultiplier;
-            cube.position.y += Math.sin(time * 1.1) * 0.01 * speedMultiplier;
+            
+            if (inVRMode) {
+                // Movimiento más suave para VR
+                cube.position.x += Math.sin(time) * 0.005 * speedMultiplier;
+                cube.position.y += Math.sin(time * 1.1) * 0.005 * speedMultiplier;
+                cube.position.z += Math.cos(time) * 0.005 * speedMultiplier;
+            } else {
+                // Movimiento original para desktop
+                cube.position.x += Math.sin(time) * 0.01 * speedMultiplier;
+                cube.position.y += Math.sin(time * 1.1) * 0.01 * speedMultiplier;
+            }
         }
     });
 }
